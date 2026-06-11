@@ -45,4 +45,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/reportes/resumen',         [ReporteController::class, 'resumen']);
     Route::get('/reportes/ventas-por-dia',  [ReporteController::class, 'ventasPorDia']);
     Route::get('/reportes/top-productos',   [ReporteController::class, 'topProductos']);
+    Route::get('/reportes/alertas',         [ReporteController::class, 'alertas']);
 });

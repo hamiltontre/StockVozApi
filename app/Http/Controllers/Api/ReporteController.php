@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Producto;
 use App\Models\Venta;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -92,5 +93,43 @@ class ReporteController extends Controller
             ->get();
 
         return response()->json($top);
+    }
+
+    /**
+     * GET /api/reportes/alertas
+     * Productos por vencer (30 días) + vencidos + stock bajo.
+     */
+    public function alertas(Request $request): JsonResponse
+    {
+        $negocioId = $request->user()->negocio_id;
+        $hoy = now()->toDateString();
+        $en30Dias = now()->addDays(30)->toDateString();
+
+        $porVencer = Producto::where('negocio_id', $negocioId)
+            ->where('activo', true)
+            ->whereNotNull('fecha_vencimiento')
+            ->whereBetween('fecha_vencimiento', [$hoy, $en30Dias])
+            ->orderBy('fecha_vencimiento')
+            ->get();
+
+        $vencidos = Producto::where('negocio_id', $negocioId)
+            ->where('activo', true)
+            ->whereNotNull('fecha_vencimiento')
+            ->where('fecha_vencimiento', '<', $hoy)
+            ->orderBy('fecha_vencimiento')
+            ->get();
+
+        $stockBajo = Producto::where('negocio_id', $negocioId)
+            ->where('activo', true)
+            ->whereColumn('stock', '<=', 'stock_minimo')
+            ->orderBy('stock')
+            ->get();
+
+        return response()->json([
+            'por_vencer' => $porVencer,
+            'vencidos'   => $vencidos,
+            'stock_bajo' => $stockBajo,
+            'total'      => $porVencer->count() + $vencidos->count() + $stockBajo->count(),
+        ]);
     }
 }

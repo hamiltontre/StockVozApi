@@ -13,7 +13,11 @@ return new class extends Migration {
             $table->foreignId('categoria_id')->nullable()->constrained('categorias')->nullOnDelete();
             $table->string('nombre', 100);
             $table->string('codigo_barras', 50)->nullable();
-            $table->unsignedBigInteger('precio')->comment('Precio en centavos');
+            $table->unsignedBigInteger('precio')->comment('Precio de VENTA en centavos');
+            $table->unsignedBigInteger('precio_costo')->default(0)->comment('Precio de compra en centavos');
+            $table->string('unidad', 20)->default('unidad')
+                  ->comment('unidad|caja|docena|libra|litro|metro|par|paquete');
+            $table->date('fecha_vencimiento')->nullable()->comment('Null si el producto no vence');
             $table->unsignedInteger('stock')->default(0);
             $table->unsignedInteger('stock_minimo')->default(1);
             $table->boolean('activo')->default(true);
@@ -23,6 +27,7 @@ return new class extends Migration {
 
             $table->index(['negocio_id', 'activo']);
             $table->index('codigo_barras');
+            $table->index(['negocio_id', 'fecha_vencimiento']); // alertas de vencimiento
         });
     }
 

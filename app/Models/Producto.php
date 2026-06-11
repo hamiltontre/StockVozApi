@@ -15,16 +15,19 @@ class Producto extends Model
 
     protected $fillable = [
         'negocio_id', 'categoria_id', 'nombre', 'codigo_barras',
-        'precio', 'stock', 'stock_minimo', 'activo', 'cliente_id',
+        'precio', 'precio_costo', 'unidad', 'fecha_vencimiento',
+        'stock', 'stock_minimo', 'activo', 'cliente_id',
     ];
 
     protected function casts(): array
     {
         return [
             'precio' => 'integer',
+            'precio_costo' => 'integer',
             'stock' => 'integer',
             'stock_minimo' => 'integer',
             'activo' => 'boolean',
+            'fecha_vencimiento' => 'date',
         ];
     }
 
