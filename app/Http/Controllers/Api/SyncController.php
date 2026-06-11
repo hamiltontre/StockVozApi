@@ -140,15 +140,31 @@ class SyncController extends Controller
             return;
         }
 
+        // Costo mayor al precio de venta suele ser un dedazo del usuario.
+        // Se acepta igual (lo corrige después) pero queda registrado.
+        if (isset($p['precio'], $p['precio_costo'])
+            && $p['precio'] > 0
+            && $p['precio_costo'] > $p['precio']) {
+            \Log::warning('StockVoz: producto con precio_costo > precio', [
+                'negocio_id'   => $negocioId,
+                'nombre'       => $p['nombre'] ?? 'desconocido',
+                'precio'       => $p['precio'],
+                'precio_costo' => $p['precio_costo'],
+            ]);
+        }
+
         Producto::updateOrCreate(
             ['negocio_id' => $negocioId, 'cliente_id' => $p['id'] ?? null],
             [
-                'nombre'        => $p['nombre'] ?? '',
-                'codigo_barras' => $p['codigo_barras'] ?? null,
-                'precio'        => $p['precio'] ?? 0,
-                'stock'         => $p['stock'] ?? 0,
-                'stock_minimo'  => $p['stock_minimo'] ?? 1,
-                'activo'        => $p['activo'] ?? true,
+                'nombre'            => $p['nombre'] ?? '',
+                'codigo_barras'     => $p['codigo_barras'] ?? null,
+                'precio'            => $p['precio'] ?? 0,
+                'precio_costo'      => $p['precio_costo'] ?? 0,
+                'unidad'            => $p['unidad'] ?? 'unidad',
+                'fecha_vencimiento' => $p['fecha_vencimiento'] ?? null,
+                'stock'             => $p['stock'] ?? 0,
+                'stock_minimo'      => $p['stock_minimo'] ?? 1,
+                'activo'            => $p['activo'] ?? true,
             ]
         );
     }

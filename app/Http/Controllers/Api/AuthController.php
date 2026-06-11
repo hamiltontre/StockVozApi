@@ -3,14 +3,15 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\RegisterRequest;
 use App\Models\Negocio;
 use App\Models\Usuario;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rule;
 
 /**
  * Autenticación para el dashboard web y registro de nuevos negocios.
@@ -23,17 +24,9 @@ class AuthController extends Controller
      * POST /api/auth/register
      * Crea un negocio nuevo con su primer usuario administrador.
      */
-    public function register(Request $request): JsonResponse
+    public function register(RegisterRequest $request): JsonResponse
     {
-        $data = $request->validate([
-            'nombre_negocio' => 'required|string|max:100',
-            'nombre_admin'   => 'required|string|max:100',
-            'email'          => 'required|email|unique:usuarios,email',
-            'password'       => 'required|string|min:8|confirmed',
-            'pin'            => 'required|digits:4',
-            'telefono'       => 'nullable|string|max:30',
-            'moneda'         => ['nullable', Rule::in(['NIO', 'USD'])],
-        ]);
+        $data = $request->validated();
 
         return DB::transaction(function () use ($data) {
             $negocio = Negocio::create([
@@ -82,12 +75,25 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
+        // Rate limiting: máximo 5 intentos por email+IP por minuto (anti fuerza bruta)
+        $key = 'login:' . Str::lower($data['email']) . '|' . $request->ip();
+
+        if (RateLimiter::tooManyAttempts($key, 5)) {
+            $seconds = RateLimiter::availableIn($key);
+            return response()->json([
+                'error'   => "Demasiados intentos. Espera {$seconds} segundos.",
+                'seconds' => $seconds,
+            ], 429);
+        }
+
         $usuario = Usuario::where('email', $data['email'])->where('activo', true)->first();
 
         if (!$usuario || !Hash::check($data['password'], $usuario->password)) {
+            RateLimiter::hit($key, 60); // ventana de 60 segundos
             return response()->json(['error' => 'Credenciales inválidas'], 401);
         }
 
+        RateLimiter::clear($key);
         $usuario->update(['ultimo_acceso' => now()]);
 
         $token = $usuario->createToken('sesion-web')->plainTextToken;
