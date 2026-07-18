@@ -113,6 +113,9 @@ class SyncController extends Controller
                 'metodo_pago' => $p['metodo_pago'] ?? 'efectivo',
                 'estado'      => $p['estado'] ?? 'completada',
                 'notas'       => $p['notas'] ?? null,
+                'es_fiado'    => (bool) ($p['es_fiado'] ?? false),
+                'fiador_nombre'   => $p['fiador_nombre'] ?? null,
+                'fiado_pagado_en' => $p['fiado_pagado_en'] ?? null,
                 'vendido_en'  => $p['creado_en'] ?? now(),
             ]);
 

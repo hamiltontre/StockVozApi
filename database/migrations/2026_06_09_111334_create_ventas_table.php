@@ -16,6 +16,10 @@ return new class extends Migration {
             $table->enum('metodo_pago', ['efectivo', 'tarjeta', 'transferencia'])->default('efectivo');
             $table->enum('estado', ['completada', 'anulada'])->default('completada');
             $table->text('notas')->nullable();
+            // Fiado (venta al crédito): deuda pendiente hasta que fiado_pagado_en tenga fecha
+            $table->boolean('es_fiado')->default(false);
+            $table->string('fiador_nombre', 100)->nullable();
+            $table->timestamp('fiado_pagado_en')->nullable();
             // ID del cliente local para evitar duplicados al sincronizar
             $table->unsignedBigInteger('cliente_id')->nullable();
             $table->timestamp('vendido_en')->nullable()

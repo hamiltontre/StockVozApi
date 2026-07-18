@@ -16,6 +16,7 @@ class Venta extends Model
     protected $fillable = [
         'negocio_id', 'usuario_id', 'total', 'descuento',
         'metodo_pago', 'estado', 'notas', 'cliente_id', 'vendido_en',
+        'es_fiado', 'fiador_nombre', 'fiado_pagado_en',
     ];
 
     protected function casts(): array
@@ -24,6 +25,8 @@ class Venta extends Model
             'total' => 'integer',
             'descuento' => 'integer',
             'vendido_en' => 'datetime',
+            'es_fiado' => 'boolean',
+            'fiado_pagado_en' => 'datetime',
         ];
     }
 
