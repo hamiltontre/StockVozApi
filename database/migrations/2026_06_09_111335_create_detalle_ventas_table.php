@@ -14,7 +14,8 @@ return new class extends Migration {
             $table->foreignId('producto_id')->nullable()->constrained('productos')->nullOnDelete();
             // Snapshot para preservar el histórico aunque el producto cambie/desaparezca
             $table->string('nombre_producto', 100);
-            $table->unsignedInteger('cantidad');
+            // decimal: se venden cantidades fraccionarias (media libra = 0.5)
+            $table->decimal('cantidad', 10, 2);
             $table->unsignedBigInteger('precio_unitario')->comment('Precio al momento de la venta, en centavos');
             $table->unsignedBigInteger('subtotal');
             $table->timestamps();

@@ -15,7 +15,7 @@ class Producto extends Model
 
     protected $fillable = [
         'negocio_id', 'categoria_id', 'nombre', 'codigo_barras',
-        'precio', 'precio_costo', 'unidad', 'fecha_vencimiento',
+        'precio', 'precio_costo', 'precio_docena', 'unidad', 'fecha_vencimiento',
         'stock', 'stock_minimo', 'activo', 'cliente_id',
     ];
 
@@ -24,8 +24,10 @@ class Producto extends Model
         return [
             'precio' => 'integer',
             'precio_costo' => 'integer',
-            'stock' => 'integer',
-            'stock_minimo' => 'integer',
+            'precio_docena' => 'integer',
+            // float: stock fraccionario (9.5 libras); decimal:2 serializaría string
+            'stock' => 'float',
+            'stock_minimo' => 'float',
             'activo' => 'boolean',
             'fecha_vencimiento' => 'date',
         ];

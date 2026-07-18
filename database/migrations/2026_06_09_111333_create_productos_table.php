@@ -15,11 +15,14 @@ return new class extends Migration {
             $table->string('codigo_barras', 50)->nullable();
             $table->unsignedBigInteger('precio')->comment('Precio de VENTA en centavos');
             $table->unsignedBigInteger('precio_costo')->default(0)->comment('Precio de compra en centavos');
+            $table->unsignedBigInteger('precio_docena')->default(0)
+                  ->comment('Precio por docena en centavos; 0 = no se vende por docena');
             $table->string('unidad', 20)->default('unidad')
                   ->comment('unidad|caja|docena|libra|litro|metro|par|paquete');
             $table->date('fecha_vencimiento')->nullable()->comment('Null si el producto no vence');
-            $table->unsignedInteger('stock')->default(0);
-            $table->unsignedInteger('stock_minimo')->default(1);
+            // decimal: el stock puede ser fraccionario (9.5 libras, 2.5 litros)
+            $table->decimal('stock', 10, 2)->default(0);
+            $table->decimal('stock_minimo', 10, 2)->default(1);
             $table->boolean('activo')->default(true);
             // ID del producto en la app local — para resolver conflictos de sync
             $table->unsignedBigInteger('cliente_id')->nullable();

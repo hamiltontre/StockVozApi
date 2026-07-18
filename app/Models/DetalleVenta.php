@@ -20,7 +20,8 @@ class DetalleVenta extends Model
     protected function casts(): array
     {
         return [
-            'cantidad' => 'integer',
+            // float: cantidades fraccionarias (media libra = 0.5)
+            'cantidad' => 'float',
             'precio_unitario' => 'integer',
             'subtotal' => 'integer',
         ];

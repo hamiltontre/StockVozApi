@@ -160,6 +160,7 @@ class SyncController extends Controller
                 'codigo_barras'     => $p['codigo_barras'] ?? null,
                 'precio'            => $p['precio'] ?? 0,
                 'precio_costo'      => $p['precio_costo'] ?? 0,
+                'precio_docena'     => $p['precio_docena'] ?? 0,
                 'unidad'            => $p['unidad'] ?? 'unidad',
                 'fecha_vencimiento' => $p['fecha_vencimiento'] ?? null,
                 'stock'             => $p['stock'] ?? 0,
